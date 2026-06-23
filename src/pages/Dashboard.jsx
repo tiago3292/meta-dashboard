@@ -1,4 +1,4 @@
-import { useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 
 import {
   LineChart,
@@ -12,35 +12,103 @@ import {
 } from "recharts"
 
 import { useFilter } from "../context/useFilter"
-import { campaigns, getSummary, getMergedDailyData } from "../data/mockData"
+import { fetchAllInsights, normalizeInsights } from "../services/metaApi" 
 import StatCard from "../components/ui/StatCard"
 
 export default function Dashboard() {
-
   const { startDate, endDate } = useFilter()
 
-  const filteredCampaigns = useMemo(() => {
-    return campaigns.map((campaign) => {
-      const filteredDays = campaign.dailyData.filter(
-        (day) => day.date >= startDate && day.date <= endDate
-      )
-      return { ...campaign, dailyData: filteredDays }
-    }).filter((campaign) => campaign.dailyData.length > 0)
+  const [campaigns, setCampaigns] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const rawInsights = await fetchAllInsights(startDate, endDate)
+
+        const normalized = normalizeInsights(rawInsights)
+
+        setCampaigns(normalized)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadData()
   }, [startDate, endDate])
 
-  const summary = useMemo(() => getSummary(filteredCampaigns), [filteredCampaigns])
+  const summary = useMemo(() => {
+    return campaigns.reduce(
+      (acc, c) => ({
+        spent: acc.spent + c.spent,
+        leads: acc.leads + c.leads,
+        reach: acc.reach + c.reach,
+      }),
+      {spent: 0, leads: 0, reach: 0}
+    )
+  }, [campaigns])
 
-  const chartData = useMemo(() => getMergedDailyData(filteredCampaigns), [filteredCampaigns])
+  const chartData = useMemo(() => {
+    const merged = {}
+    campaigns.forEach((campaign) => {
+      campaign.dailyData.forEach((day) => {
+        if (!merged[day.date]) {
+          merged[day.date] = { date: day.date, spent: 0, leads: 0, reach: 0 }
+        }
+        merged[day.date].spent += day.spent
+        merged[day.date].leads += day.leads
+        merged[day.date].reach += day.reach
+      })
+    })
+    return Object.values(merged).sort((a, b) => new Date(a.date) - new Date(b.date))
+  }, [campaigns])
 
   const avgCpl = summary.leads > 0
-  ? (summary.spent / summary.leads).toFixed(2)
-  : 0
+    ? (summary.spent / summary.leads).toFixed(2)
+    : 0
 
   const formatBRL = (value) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
 
   const formatNumber = (value) =>
     new Intl.NumberFormat("pt-BR").format(value)
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-4">
+        <div className="w-10 h-10 border-4 border-slate-600 border-t-blue-500
+        rounded-full animate-spin" />
+        <p className="text-slate-400 text-sm">Buscando dados do Meta Ads...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 gap-3">
+        <p className="text-red-400 font-medium">Erro ao buscar dados</p>
+        <p className="text-slate-400 text-sm text-center max-w-md">{error}</p>
+        <p className="text-slate-500 text-xs">
+          Verifique se o token no .env ainda é válido e tente novamente.
+        </p>
+      </div>
+    )
+  }
+
+  if (campaigns.length === 0) {
+    return (
+      <div className="flex flex-col item-center justify-center h-64 gap-3">
+        <p className="text-slate-400">Nenhuma campanha encontrada nesse período.</p>
+        <p className="text-slate-500 text-sm">Tente selecionar um intervalo de datas diferente.</p>
+      </div>
+    )
+  }
 
   return (
 

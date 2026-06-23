@@ -1,7 +1,7 @@
 import { parseISOWithOptions } from "date-fns/fp"
 import { useState, useEffect } from "react"
 
-export default function CampaignModal({ compaign, onSave, onClose}) {
+export default function CampaignModal({ campaign, onSave, onClose}) {
 
     const [formData, setFormData] = useState({
         name: "",
