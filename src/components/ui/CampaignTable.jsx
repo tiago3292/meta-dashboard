@@ -1,4 +1,4 @@
-export default function CampaignTable({ campaigns, onEdit, onDelete }) {
+export default function CampaignTable({ campaigns }) {
 
     const formatBRL = (value) =>
         new Intl.NumberFormat("pt-BR", {style: "currency", currency: "BRL"}).format(value)
@@ -7,17 +7,17 @@ export default function CampaignTable({ campaigns, onEdit, onDelete }) {
         new Intl.NumberFormat("pt-BR").format(value)
 
     return (
-        <div className="overflow-x-auto rounded-xl border border-slate-700">
+        <div className="overflow-x-auto border border-zinc-700">
             <table className="w-full text-sm">
 
                 <thead>
-                    <tr className="bg-slate-700">
+                    <tr className="bg-zinc-700">
                         {[
-                            "Campanha", "Status", "Gasto", "Leads", "Alcance", "CPL", "Ações"
+                            "Campanha", "Status", "Gasto", "Leads", "Alcance", "CPL"
                         ].map((heading) => (
                             <th
                                 key={heading}
-                                className="px-4 py-3 text-left text-xs text-slate-400
+                                className="px-4 py-3 text-left text-xs text-zinc-400
                                 uppercase tracking-wider font-medium"
                             >
                                 {heading}
@@ -31,12 +31,12 @@ export default function CampaignTable({ campaigns, onEdit, onDelete }) {
                         <tr
                             key={campaign.id}
                             className={[
-                                "border-t border-slate-700 transition-colors hover:bg-slate-700/50",
-                                index % 2 === 0 ? "bg-slate-800" : "bg-slate-800/60",
+                                "border-t border-zinc-700 transition-colors hover:bg-zinc-700/50",
+                                index % 2 === 0 ? "bg-zinc-800" : "bg-zinc-800/60",
                             ].join(" ")}
                         >
 
-                            <td className="px-3 py-3 text-white font-medium">
+                            <td className="px-3 py-3 text-zinc-300 font-medium">
                                 {campaign.name}
                             </td>
 
@@ -51,29 +51,10 @@ export default function CampaignTable({ campaigns, onEdit, onDelete }) {
                                 </span>
                             </td>
 
-                            <td className="px-4 py-3 text-slate-300">{formatBRL(campaign.spent)}</td>
-                            <td className="px-4 py-3 text-slate-300">{formatNumber(campaign.leads)}</td>
-                            <td className="px-4 py-3 text-slate-300">{formatNumber(campaign.reach)}</td>
-                            <td className="px-4 py-3 text-slate-300">{formatBRL(campaign.cpl)}</td>
-
-                            <td className="px-4 py-3">
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => onEdit(campaign)}
-                                        className="px-3 py-1 rounded-lg bg-blue-600/20 text-blue-400
-                                            hover:bg-blue-600/40 text-xs font-medium transition-colors"
-                                    >
-                                        Editar
-                                    </button>
-                                    <button
-                                        onClick={() => onDelete(campaign.id)}
-                                        className="px-3 py-1 rounded-lg bg-red-600/20 text-red-400
-                                            hover:bg-red-600/40 text-xs font-medium transition-colors"
-                                    >
-                                        Excluir
-                                    </button>
-                                </div>
-                            </td>
+                            <td className="px-4 py-3 text-zinc-300">{formatBRL(campaign.spent)}</td>
+                            <td className="px-4 py-3 text-zinc-300">{formatNumber(campaign.leads)}</td>
+                            <td className="px-4 py-3 text-zinc-300">{formatNumber(campaign.reach)}</td>
+                            <td className="px-4 py-3 text-zinc-300">{formatBRL(campaign.cpl)}</td>
                         
                         </tr>
                     ))}

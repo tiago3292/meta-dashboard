@@ -82,9 +82,9 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
-        <div className="w-10 h-10 border-4 border-slate-600 border-t-blue-500
+        <div className="w-10 h-10 border-4 border-zinc-600 border-t-blue-500
         rounded-full animate-spin" />
-        <p className="text-slate-400 text-sm">Buscando dados do Meta Ads...</p>
+        <p className="text-zinc-400 text-sm">Buscando dados do Meta Ads...</p>
       </div>
     )
   }
@@ -93,8 +93,8 @@ export default function Dashboard() {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3">
         <p className="text-red-400 font-medium">Erro ao buscar dados</p>
-        <p className="text-slate-400 text-sm text-center max-w-md">{error}</p>
-        <p className="text-slate-500 text-xs">
+        <p className="text-zinc-400 text-sm text-center max-w-md">{error}</p>
+        <p className="text-zinc-500 text-xs">
           Verifique se o token no .env ainda é válido e tente novamente.
         </p>
       </div>
@@ -104,8 +104,8 @@ export default function Dashboard() {
   if (campaigns.length === 0) {
     return (
       <div className="flex flex-col item-center justify-center h-64 gap-3">
-        <p className="text-slate-400">Nenhuma campanha encontrada nesse período.</p>
-        <p className="text-slate-500 text-sm">Tente selecionar um intervalo de datas diferente.</p>
+        <p className="text-zinc-400">Nenhuma campanha encontrada nesse período.</p>
+        <p className="text-zinc-500 text-sm">Tente selecionar um intervalo de datas diferente.</p>
       </div>
     )
   }
@@ -137,9 +137,9 @@ export default function Dashboard() {
         />
       </div>
 
-      <div className="bg-slate-800 rounded-xl p-5 border border-slate-700">
+      <div className="bg-zinc-800 p-5 border border-zinc-700">
 
-        <h2 className="text-white font-semibold mb-4">
+        <h2 className="text-zinc-300 font-semibold mb-4">
           Desempenho do Período
         </h2>
 
