@@ -61,7 +61,7 @@ src/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/tiago3292/meta-dashboard/tree/mock-data-crud
+git clone git clone -b mock-data-crud https://github.com/tiago3292/meta-dashboard.git
 cd meta-dashboard
 
 # Instale as dependências
