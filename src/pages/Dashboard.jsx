@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from "react"
 
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
+  LineChart, // o container do gráfico de linha
+  Line, // cada linha do gráfico
+  XAxis, // eixo horizontal (datas)
+  YAxis, // eixo vertical (valores)
+  CartesianGrid, // as linhas de grade ao fundo
+  Tooltip, // o balão que aparece ao passar o mouse
+  Legend, // a legenda das linhas
+  ResponsiveContainer, // faz o gráfico ocupar 100% da largura disponível
 } from "recharts"
 
 import { useFilter } from "../context/useFilter"
@@ -18,54 +18,87 @@ import StatCard from "../components/ui/StatCard"
 export default function Dashboard() {
   const { startDate, endDate } = useFilter()
 
+  // Guarda os dados normalizados vindos da API
   const [campaigns, setCampaigns] = useState([])
+
+  // Controla quando mostrar o indicador de carregamento
   const [loading, setLoading] = useState(true)
+
+  // Guarda a mensagem de erro caso a chamada falhe
   const [error, setError] = useState(null)
 
+  // Roda toda vez que startDate ou endDate mudam
   useEffect(() => {
+
+    // A função de busca é definida dentro do useEffect
+    // porque funções async não podem ser passadas diretamente para o useEffect
     async function loadData() {
-      setLoading(true)
-      setError(null)
+      // Sempre que uma nova busca é iniciada:
+      setLoading(true) // ativa o indicador de carregamento
+      setError(null) // limpa qualquer erro anterior
 
       try {
+        // Busca dados brutos da API do Meta
         const rawInsights = await fetchAllInsights(startDate, endDate)
 
+        // Transforma para o formato que os componentes entendem
         const normalized = normalizeInsights(rawInsights)
 
         setCampaigns(normalized)
       } catch (err) {
+        // Se qualquer coisa der errado, guardamos a mensagem de erro
+        // para exibir na tela
         setError(err.message)
       } finally {
+        // finally roda SEMPRE, independente de sucesso ou erro
+        // Garante que o loading seja desativado em qualquer cenário
         setLoading(false)
       }
     }
 
     loadData()
-  }, [startDate, endDate])
+  }, [startDate, endDate]) //garante que a busca roda novamente
+  //sempre que o período selecionado mudar
 
+
+  // Essa função recebe um array de campanhas e retorna um único objeto
+  // com os totais somados — vai alimentar os cards de resumo do Dashboard
   const summary = useMemo(() => {
     return campaigns.reduce(
+      // acc é o "acumulador". Começa zerado e vai somando a cada campanha
       (acc, c) => ({
-        spent: acc.spent + c.spent,
-        leads: acc.leads + c.leads,
-        reach: acc.reach + c.reach,
+        spent: acc.spent + c.spent, // soma o valor gasto
+        leads: acc.leads + c.leads, // soma os leads
+        reach: acc.reach + c.reach, // soma o alcance
       }),
+
+      // Valor inicial do acumulador
       {spent: 0, leads: 0, reach: 0}
     )
   }, [campaigns])
 
+  // Essa função agrupa o desempenho diário de todas as campanhas em uma única linha do tempo
+  // O resultado vai alimentar o gráfico de linha do Dashboard
   const chartData = useMemo(() => {
+
+    // Objeto vazio que vai acumular os dados por data
+    // { "2025-06-01": { date, spent, leads, reach }, ... }
     const merged = {}
+
     campaigns.forEach((campaign) => {
       campaign.dailyData.forEach((day) => {
         if (!merged[day.date]) {
+          // Se essa data ainda não existe no objeto, cria ela do zero
           merged[day.date] = { date: day.date, spent: 0, leads: 0, reach: 0 }
         }
+        // Soma os valores dessa campanha nos totais daquele dia
         merged[day.date].spent += day.spent
         merged[day.date].leads += day.leads
         merged[day.date].reach += day.reach
       })
     })
+
+    // Object.values transforma o objeto em array, e sort ordena por data crescente
     return Object.values(merged).sort((a, b) => new Date(a.date) - new Date(b.date))
   }, [campaigns])
 
@@ -79,6 +112,7 @@ export default function Dashboard() {
   const formatNumber = (value) =>
     new Intl.NumberFormat("pt-BR").format(value)
 
+  // Estado de carregamento
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
@@ -89,6 +123,7 @@ export default function Dashboard() {
     )
   }
 
+  // Estado de erro
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-3">
@@ -101,6 +136,8 @@ export default function Dashboard() {
     )
   }
 
+  // Estado sem dados
+  // Quando a API responde mas não há campanhas no período selecionado
   if (campaigns.length === 0) {
     return (
       <div className="flex flex-col item-center justify-center h-64 gap-3">
@@ -110,6 +147,7 @@ export default function Dashboard() {
     )
   }
 
+  // Estado normal: dados carregados com sucesso
   return (
 
     <div className="flex flex-col gap-6">
@@ -163,9 +201,8 @@ export default function Dashboard() {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#1e293b",
-                border: "1px solid #334155",
-                borderRadius: "8px",
+                backgroundColor: "#212124",
+                border: "1px solid #333338",
               }}
               labelStyle={{ color: "#94a3b8" }}
               itemStyle={{ color: "#e2e8f0" }}

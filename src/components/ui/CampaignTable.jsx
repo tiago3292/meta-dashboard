@@ -1,8 +1,10 @@
 export default function CampaignTable({ campaigns }) {
 
+    // Formata número como moeda brasileira
     const formatBRL = (value) =>
         new Intl.NumberFormat("pt-BR", {style: "currency", currency: "BRL"}).format(value)
 
+    // Formata número com separador de milhar
     const formatNumber = (value) =>
         new Intl.NumberFormat("pt-BR").format(value)
 
@@ -32,6 +34,8 @@ export default function CampaignTable({ campaigns }) {
                             key={campaign.id}
                             className={[
                                 "border-t border-zinc-700 transition-colors hover:bg-zinc-700/50",
+                                // Alterna a cor de fundo das linhas para facilitar a leitura
+                                // index % 2 === 0 é true para índices pares (0, 2, 4...)
                                 index % 2 === 0 ? "bg-zinc-800" : "bg-zinc-800/60",
                             ].join(" ")}
                         >
@@ -40,6 +44,7 @@ export default function CampaignTable({ campaigns }) {
                                 {campaign.name}
                             </td>
 
+                            {/* Badge de status: muda de cor dependendo se está ativa ou pausada */}
                             <td className="px-4 py-3">
                                 <span className={[
                                     "px-2 py-0.5 rounded-full text-xs font-semibold",

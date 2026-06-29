@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { useFilter } from "../context/useFilter"
 import { fetchCampaigns, fetchAllInsights, normalizeInsights } from "../services/metaApi"
 import CampaignTable from "../components/ui/CampaignTable"
-import CampaignModal from "../components/ui/CampaignModal"
 
 export default function Campaigns() {
   const { startDate, endDate } = useFilter()
@@ -10,7 +9,6 @@ export default function Campaigns() {
   const [campaigns, setCampaigns]   = useState([])
   const [loading, setLoading]       = useState(true)
   const [error, setError]           = useState(null)
-  const [modalState, setModalState] = useState({ open: false, campaign: null })
 
   useEffect(() => {
     async function loadData() {
@@ -18,6 +16,11 @@ export default function Campaigns() {
       setError(null)
 
       try {
+        // Faz duas chamadas em paralelo:
+        // 1. fetchCampaigns > traz id, name e status de cada campanha
+        // 2. fetchAllInsights > traz as métricas do período selecionado
+        // Promise.all espera as DUAS terminarem antes de continuar
+        // Isso é mais rápido do que fazer uma chamada de cada vez
         const [rawCampaigns, rawInsights] = await Promise.all([
           fetchCampaigns(),
           fetchAllInsights(startDate, endDate),
@@ -68,7 +71,7 @@ export default function Campaigns() {
     loadData()
   }, [startDate, endDate])
 
-  const handleClose = () => setModalState({ open: false, campaign: null })
+
 
   const handleSave = (updatedCampaign) => {
     setCampaigns((prev) => {
@@ -86,7 +89,7 @@ export default function Campaigns() {
     setCampaigns((prev) => prev.filter((c) => c.id !== id))
   }
 
-  // ── Totais para os cards de resumo ──
+  // Totais para os cards de resumo
   const totalSpent      = campaigns.reduce((acc, c) => acc + c.spent, 0)
   const totalLeads      = campaigns.reduce((acc, c) => acc + c.leads, 0)
   const activeCampaigns = campaigns.filter((c) => c.status === "ACTIVE").length
@@ -94,7 +97,7 @@ export default function Campaigns() {
   const formatBRL = (value) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
 
-  // ── Estados de carregamento e erro ──
+  // Estados de carregamento e erro
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center h-64 gap-4">
@@ -113,7 +116,7 @@ export default function Campaigns() {
     )
   }
 
-  // ── Renderização principal ──
+  // Renderização principal
   return (
     <div className="flex flex-col gap-6">
 
@@ -152,13 +155,6 @@ export default function Campaigns() {
       ) : (
         <CampaignTable
           campaigns={campaigns}
-        />
-      )}
-
-      {/* Modal */}
-      {modalState.open && (
-        <CampaignModal
-          campaign={modalState.campaign}
         />
       )}
 

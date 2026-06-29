@@ -1,7 +1,10 @@
+// Importando hook personalizado
 import { useFilter } from "../../context/useFilter"
 
 export default function Header() {
 
+    // Acessa as datas e funcão de atualização direto do contexto
+    // sem prop drilling
     const { startDate, endDate, updateDates } = useFilter()
 
     return (
@@ -14,11 +17,13 @@ export default function Header() {
 
             <div className="flex items-center gap-3">
 
-                <span className="text-zinc-400 text-sm">Período</span>
+                {/*<span className="text-zinc-400 text-sm">Período</span>*/}
 
                 <input
                 type="date"
                 value={startDate}
+                // onChange é chamado toda vez que o usuário muda a data
+                // e.target.value é o novo valor digitado
                 onChange={(e) => updateDates(e.target.value, endDate)}
                 className="bg-zinc-700 text-zinc-300 text-sm rounded-lg px-3 py-1.5 border
                 border-zinc-600 focus:outline-none focus:border-blue-500 [color-scheme:dark]"
