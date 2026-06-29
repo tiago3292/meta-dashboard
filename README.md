@@ -2,8 +2,6 @@
 
 Dashboard para acompanhamento de campanhas do Meta Ads (Facebook/Instagram) em tempo real. Desenvolvido como projeto do **Month 6 Challenge** de um desafio de desenvolvimento de 12 meses, com foco em conceitos avançados de React.
 
-![Dashboard Preview](https://via.placeholder.com/900x500/1e293b/3b82f6?text=Meta+Ads+Dashboard)
-
 ---
 
 ## Funcionalidades
