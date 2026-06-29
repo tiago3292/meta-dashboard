@@ -37,7 +37,6 @@ src/
 │   └── ui/
 │       ├── StatCard.jsx      # Card de métrica
 │       ├── CampaignTable.jsx # Tabela de campanhas
-│       └── CampaignModal.jsx # Modal de criação/edição
 ├── context/
 │   ├── FilterContext.jsx     # Provider do filtro global
 │   └── useFilter.js          # Hook de acesso ao contexto
