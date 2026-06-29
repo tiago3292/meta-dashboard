@@ -61,7 +61,7 @@ src/
 
 ```bash
 # Clone o repositório
-git clone https://github.com/seu-usuario/meta-dashboard.git
+git clone https://github.com/tiago3292/meta-dashboard
 cd meta-dashboard
 
 # Instale as dependências
